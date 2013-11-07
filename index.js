@@ -43,6 +43,8 @@ actions.onFileSave= function onFileSave(message) {
 	var noMDFile;
 	var noMDLine;
 	var theStream;
+	var toc = '';
+	var tocPos;
 	
     function replaceAll (theString, oldString, newString) {
     	return theString.split(oldString).join(newString)
@@ -73,6 +75,11 @@ actions.onFileSave= function onFileSave(message) {
 		lines = fileContents.split(LINE_ENDING);
 		
 		//------------------------------------------------------------------
+		// See if there is a Table of Contents.
+		//------------------------------------------------------------------
+		tocPos = lines.indexOf('//| TOC');
+
+		//------------------------------------------------------------------
 		// Get the markdown.
 		//------------------------------------------------------------------
 		mdContents = '';
@@ -94,6 +101,47 @@ actions.onFileSave= function onFileSave(message) {
 					noMDContents = noMDContents + noMDLine + LINE_ENDING;					
 				}
 			}
+		}
+		
+		//------------------------------------------------------------------
+		// Get the Table of Contents.
+		//------------------------------------------------------------------
+		if (tocPos >= 0) {
+			lines = mdContents.split(LINE_ENDING);
+			
+			lines.forEach(function (line, index, lines) {
+				              var anchorTitle;
+				              var dotPos;
+				              var spaceParenIndex;
+				              var title;
+				              
+						      if (line.match(/^\#\#\#\s/) !== null) { // The line starts with ###?
+						      	  title = line.substring(4).trim();
+						      	  anchorTitle = title.toUpperCase().replace(/\\/g, '');
+						      	  spaceParenIndex = anchorTitle.indexOf(' (');
+						      	  
+						      	  if (spaceParenIndex >= 0) {
+						      	      anchorTitle = anchorTitle.substring(0, spaceParenIndex);
+						      	  }
+						      	  
+						      	  anchorTitle = anchorTitle.replace(/\s/g, '_');
+						      	  
+						          lines[index] = '<a id="' + anchorTitle + '"></a>' + LINE_ENDING + line;
+						          
+						          title = (dotPos = title.indexOf('.')) < 0 ? title : title.substring(dotPos + 1);
+						          toc += '    * [' + title + '](#' + anchorTitle + ')' + LINE_ENDING;
+                              }
+                              else if (index > 0 && line !== '' && line.match(/[^\-]/) === null) { // The line is all dashes?
+	                          	  title = lines[index - 1].trim();
+						      	  anchorTitle = title.toUpperCase().replace(/\\/g, '').replace(/\s/g, '_');
+						          lines[index - 1] = '<a id="' + anchorTitle + '"></a>' + LINE_ENDING + lines[index - 1];
+					          	  toc += '* [' + title + '](#' + anchorTitle + ')' + LINE_ENDING;
+                              }
+                          });
+                          
+            lines[lines.indexOf('TOC')] = 'Contents' + LINE_ENDING + '--------' + LINE_ENDING + toc;
+
+            mdContents = lines.join(LINE_ENDING);
 		}
 	
 		//------------------------------------------------------------------

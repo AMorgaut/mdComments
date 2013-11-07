@@ -1,10 +1,36 @@
-mdComments Wakanda Studio Extension
-===================================
+mdComments Wakanda Studio Extension v1.1
+========================================
 
 Allows you to intersperse comments containing markdown documentation in your Javascript code. When a Javascript file is saved in Wakanda Studio, a corresponding markdown file is automatically created from the markdown comments named *js-file-name*.js.md. To facilitate debugging while keeping file sizes down, another corresponding file is created named *js-file-name*.no-md.js with all markdown comments removed. Original Javascript files are never modified. No files are generated when saving a Javascript file containing no markdown comments.
 
 To add a markdown comment, simply begin it with a bar (//|). For a blank markdown line, hit return after the bar. For lines with content, add a space after the bar (to make it more readable in the code) and then enter the line of markdown. The extra space will automaticaly be removed when the markdown file is generated. Its a very handy way of documenting a module's interface so that you or other developers don't have to sift though your code to figure out how to use your module.
 
+Optionally, you can add a Table of Contents by including a TOC markdown comment where you want it to appear. Markdown lines that are underlined will appear as topic links and lines that begin with `###` are subtopic links.
+
+```javascript
+//| TOC
+//|
+//| Topic 1
+//| -------
+//|
+//| ### Subtopic A
+//| ### Subtopic B
+//|
+//| Topic 2
+//| -------
+//|
+//| ### Subtopic C
+//| ### Subtopic D
+```
+
+The above will replace TOC with the following:
+
+* [Topic 1](#)
+    * [Subtopic A](#)
+    * [Subtopic B](#)
+* [Topic 2](#)
+    * [Subtopic C](#)
+    * [Subtopic D](#)
 
 Example
 -------
@@ -28,6 +54,14 @@ Which will look like this when viewed as markdown:
 Examples:```javascriptmoney(24).times(10); // 240.00
 	var orderAmount = money(100);var salesTaxRate = 0.05;orderAmount.times(salesTaxRate); // 5.00
 ```
+
+
+Change Log
+----------
+
+### 1.1
+
+* Added the ability to automatically generate a Table of Contents by including a TOC markdown comment.
 
 
 License
